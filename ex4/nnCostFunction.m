@@ -75,6 +75,7 @@ for t = 1:m,
     newy(t, y(t, 1)) = 1;
 end
 
+% for each output unit
 for k = 1:num_labels,
     yk = newy(:, k);
     Jk = 1 / m * sum(-yk .* log(a3(:, k)) - (1 - yk) .* log(1 - a3(:, k)));
@@ -84,22 +85,19 @@ end;
 regularization = lambda / 2 / m * (sum(sum(Theta1(:, 2:end) .^ 2)) + sum(sum(Theta2(:, 2:end) .^ 2)));
 J = J + regularization;
 
+for t = 1:m,
+    delta_3 = (a3(t, :) - newy(t, :))'; % 10 * 1 
+    delta_2 = (Theta2' * delta_3) .* a2(t, :)' .* (1 - a2(t, :))'; % 26 * 1
+    delta_2 = delta_2(2: end); % 25 * 1
+    Theta2_grad = Theta2_grad + delta_3 * a2(t, :);
+    Theta1_grad = Theta1_grad + delta_2 * a1(t, :);
+end;
 
+Theta2_grad = Theta2_grad / m;
+Theta1_grad = Theta1_grad / m;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Theta2_grad(:, 2:end) = Theta2_grad(:, 2:end) + lambda / m * Theta2(:, 2:end);
+Theta1_grad(:, 2:end) = Theta1_grad(:, 2:end) + lambda / m * Theta1(:, 2:end);
 
 % -------------------------------------------------------------
 
